@@ -25,6 +25,7 @@ class Accident:
 
         self.verbose = verbose
         self.global_percent = 0
+        self.global_initial_percent = 0
 
         if "cost" in inputDico :
             self.global_cost = inputDico["cost"]
@@ -42,21 +43,39 @@ class Accident:
         else :
             raise Exception('[Accident::Init] companies not found in input datas')
         self.companies_list = companies_list
+        self.global_initial_percent = self.global_percent
 
-        self.remaining_cost = self.global_cost- self.reparted_cost
+        self.calculate_remaining_cost()
 
         if verbose:
-            print("Initial informations : ")
-            print("Full cost {0:.2f} reparted in {1:.2f}%".format(self.global_cost, self.global_percent))
-            if self.remaining_cost > 0 :
-                print("So it remains {0:.2f} euros".format(self.remaining_cost))
-            print("Company details : ")
-            for company in self.companies_list :
-                print("    - {0}".format(company))
-            print("--------------------------------------------------------------\n\n")
+            self.print_result("Initial information : ")
 
         if self.remaining_cost > 0 :
             self.repartition()
+
+        # Update the percent after distribution
+        global_percent = 0
+        for company in self.companies_list:
+            company.calculate_final_percent(self.global_cost, self.global_percent)
+            global_percent += company.percent
+        self.global_percent = global_percent
+
+        if verbose:
+            self.print_result("Final results : ")
+
+
+    def print_result(self, title):
+        print(title)
+        print("Full cost {0:.2f} reparted in {1:.2f}%".format(self.global_cost, self.global_percent))
+        if self.remaining_cost > 0:
+            print("So it remains {0:.2f} euros".format(self.remaining_cost))
+        print("Company details : ")
+        for company in self.companies_list:
+            print("    - {0}".format(company))
+        print("--------------------------------------------------------------")
+
+    def calculate_remaining_cost(self):
+        self.remaining_cost = (self.global_cost * self.global_initial_percent / 100) - self.reparted_cost
 
     def repartition(self):
 
@@ -65,14 +84,14 @@ class Accident:
 
         while not stop:
             # Calculate sum of percent for companies with max reached
-            percent_to_divide = 0
+            percent_remaining = 0
             for company in self.companies_list :
-                if company.maxReached :
-                    percent_to_divide += company.percent
+                if not company.maxReached :
+                    percent_remaining += company.percent
 
             # Update the percent after distribution
             for company in self.companies_list:
-                company.update_percent(percent_to_divide, self.global_percent)
+                company.update_percent(percent_remaining)
 
             # Update the cost after distribution
             self.global_percent = 0
@@ -82,24 +101,13 @@ class Accident:
                 self.global_percent += company.percent
                 self.reparted_cost += company.cost
 
-            self.remaining_cost = self.global_cost - self.reparted_cost
-
+            self.remaining_cost = (self.global_cost * self.global_initial_percent / 100) - self.reparted_cost
 
             if self.verbose:
-                print("Repartition {0} information : ".format(iteration + 1))
-                print("Full cost {0:.2f} reparted in {1:.2f}%".format(self.global_cost, self.global_percent))
-                if self.remaining_cost > 0:
-                    print("So it remains {0:.2f} euros".format(self.remaining_cost))
-                print("Company details : ")
-                for company in self.companies_list:
-                    print("    - {0}".format(company))
-                print("--------------------------------------------------------------\n\n")
-
-                # company.calculateCost()
-                # print(company)
+                self.print_result("Repartition {0} results : ".format(iteration + 1))
 
             iteration += 1
-            stop = self.remaining_cost < 0.001 or iteration > 0 #len(self.companies_list)
+            stop = self.remaining_cost < 0.001 or iteration >= (len(self.companies_list) - 1)
 
         #
         #
@@ -113,6 +121,7 @@ class Accident:
 if __name__ == '__main__':
 
     inputDico = {}
+    # with open("inputFile.json", "r") as file :
     with open("inputFileFaucher.json", "r") as file :
         inputDico = json.load(file)
 

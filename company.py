@@ -43,7 +43,7 @@ class Company:
     def update_cost(self, global_cost):
         cost = self.cost + global_cost * self.percent / 100.0
 
-        if cost > self.max_payment :
+        if cost >= self.max_payment :
             self.maxReached = True
             self.cost = self.max_payment
         else :
@@ -57,11 +57,16 @@ class Company:
         txt = "Company {0} : {1:.2f}% attribution, cost {3:.2f} euros, max {2:.2f} euros ({4})".format(self.name, self.percent, self.max_payment, self.cost, "Reached" if self.maxReached else "Not Reached")
         return txt
 
-    def update_percent(self, percent_to_divide, original_total):
+    def update_percent(self, remaining_percent):
+        # print(remaining_percent)
         if self.maxReached:
             self.percent = 0
         else:
-            self.percent = self.percent * original_total / (original_total - percent_to_divide)
+            # self.percent = self.percent * original_total / (original_total - percent_to_divide)
+            self.percent = self.percent * 100 / remaining_percent
+
+    def calculate_final_percent(self, global_cost, global_percent) :
+        self.percent = self.cost * global_percent / global_cost
 
 
 
