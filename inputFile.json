@@ -1,0 +1,19 @@
+{
+  "cost" : 10000,
+  "companies" : [
+    {
+      "name" : "societe1",
+      "percent" : 10,
+      "max_payment" : 10000
+    },
+    {
+      "name" : "societe2",
+      "percent" : 80
+    },
+    {
+      "name" : "societe3",
+      "percent" : 10,
+      "max_payment" : 500
+    }
+  ]
+}

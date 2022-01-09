@@ -1,0 +1,30 @@
+{
+  "cost" : 3184335.7,
+  "companies" : [
+    {
+      "name" : "IDF Demolition",
+      "percent" : 50
+    },
+    {
+      "name" : "Becar",
+      "percent" : 5
+    },
+    {
+      "name" : "Fouquoire",
+      "percent" : 15
+    },
+    {
+      "name" : "Bechu",
+      "percent" : 15
+    },
+    {
+      "name" : "Samsic securité",
+      "percent" : 5
+    },
+    {
+      "name" : "Faucher",
+      "percent" : 10,
+      "max_payment" : 152449
+    }
+  ]
+}
